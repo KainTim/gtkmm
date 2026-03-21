@@ -9,37 +9,62 @@ class MyWindow : public Gtk::Window
     public:
         MyWindow(){
             loadCss();
-            m_button = Gtk::Button("test");
-            m_button.signal_clicked().connect(sigc::mem_fun(*this,&MyWindow::onButtonClicked));
+            m_button_not_effective = Gtk::Button("Not Effective");
+            m_button_not_effective.signal_clicked().connect(sigc::mem_fun(*this,&MyWindow::onNotEffectiveButtonClicked));
+            m_button_super_effective = Gtk::Button("Super Effective");
+            m_button_super_effective.signal_clicked().connect(sigc::mem_fun(*this,&MyWindow::onSuperEffectiveButtonClicked));
 
-            m_label = Gtk::Label("Hello!");
-            m_label.get_style_context()->add_provider(css_provider,GTK_STYLE_PROVIDER_PRIORITY_USER+1);
-            m_label.add_css_class("label");
+            {
+                m_label_left = Gtk::Label("Left");
+                m_label_left.get_style_context()->add_provider(css_provider,GTK_STYLE_PROVIDER_PRIORITY_USER+1);
+                m_label_left.add_css_class("label");
+                m_label_left.add_css_class("left");
+            }
 
-            m_picture = Gtk::Picture("/usr/share/doc/gtkmm-4.0/reference/html/image1.png");
-            m_picture.set_size_request(200,200);
+            {
+                m_label_right = Gtk::Label("Right");
+                m_label_right.get_style_context()->add_provider(css_provider,GTK_STYLE_PROVIDER_PRIORITY_USER+1);
+                m_label_right.add_css_class("label");
+                m_label_right.add_css_class("right");
+            }
+
 
             m_layout_grid = Gtk::Grid();
             m_layout_grid.get_style_context()->add_provider(css_provider,GTK_STYLE_PROVIDER_PRIORITY_USER+1);
-            m_layout_grid.attach(m_button, 0, 0);
-            m_layout_grid.attach(m_label, 1, 0);
-            m_layout_grid.attach(m_picture, 0, 1);
+            for (int x = 0; x < 7; x++)
+            {
+                for (int y = 0; y < 5; y++)
+                {
+                    auto empty_label = Gtk::Label("");
+                    m_layout_grid.attach(empty_label, x,y);
+                }
+            }
+            
+            m_layout_grid.attach(m_label_left, 1, 1, 2);
+            m_layout_grid.attach(m_label_right, 4, 1, 2);
+            m_layout_grid.set_row_homogeneous(true);
+            m_layout_grid.set_column_homogeneous(true);
+            m_layout_grid.attach(m_button_not_effective, 2, 3);
+            m_layout_grid.attach(m_button_super_effective, 4, 3);
             m_layout_grid.add_css_class("grid");
 
             set_child(m_layout_grid);
             set_size_request(800,600);
         }
-        void onButtonClicked(){
-            std::cout<<"hello world";
-            std::flush(std::cout);
+        void onNotEffectiveButtonClicked(){
+            std::cout<<"Not effective\n";
+        }
+        void onSuperEffectiveButtonClicked(){
+            std::cout<<"Super effective\n";
         }
         void loadCss(){
             css_provider = Gtk::CssProvider::create();
             css_provider->load_from_path("main.css");
         }
-        Gtk::Picture m_picture;
-        Gtk::Button m_button;
-        Gtk::Label m_label;
+        Gtk::Button m_button_not_effective;
+        Gtk::Button m_button_super_effective;
+        Gtk::Label m_label_left;
+        Gtk::Label m_label_right;
         Gtk::Grid m_layout_grid;
         Glib::RefPtr<Gtk::CssProvider> css_provider;
 };
